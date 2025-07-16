@@ -82,7 +82,10 @@ async def run(playwright):
             # Fermer la popup
             close_btn = await page.query_selector("div[role='dialog'] button")
             if close_btn:
-                await close_btn.click()
+                try:
+                    await close_btn.click(timeout=2000)
+                except Exception as e:
+                    print("Impossible de cliquer sur le bouton de fermeture :", e)
             await asyncio.sleep(1)
 
             if len(profile_urls) >= MAX_PROFILES:
@@ -91,6 +94,11 @@ async def run(playwright):
     print(f"Profils extraits pour #{HASHTAG} :")
     for url in profile_urls:
         print(url)
+
+    # Sauvegarder dans un fichier texte
+    with open(f"profils_{HASHTAG}.txt", "w", encoding="utf-8") as f:
+        for url in profile_urls:
+            f.write(url + "\n")
 
     await browser.close()
 
